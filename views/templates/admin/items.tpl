@@ -28,21 +28,21 @@
 
 		<ul id="items" class="list-unstyled">
 			{foreach from=$htmlItems.items item=item}
-			<li id="item-{$item.id_prettypegs_attribute_preferences|escape:'htmlall':'UTF-8'}" class="item well">
+			<li id="item-{$item.id_pdc|escape:'htmlall':'UTF-8'}" class="item well">
 				<form method="post" action="{$htmlItems.postAction|escape:'htmlall':'UTF-8'}" enctype="multipart/form-data" class="item-form defaultForm  form-horizontal">
 
 					<div class="btn-group pull-right">
 						<button class="btn btn-default button-edit">
-							<span class="button-edit-edit"><i class="icon-edit"></i> {l s='Edit' mod='prettypegsattributepreferences'}</span>
-							<span class="button-edit-close hide"><i class="icon-remove"></i> {l s='Close' mod='prettypegsattributepreferences'}</span>
+							<span class="button-edit-edit"><i class="icon-edit"></i> {l s='Edit' mod='productdescriptioncustomizer'}</span>
+							<span class="button-edit-close hide"><i class="icon-remove"></i> {l s='Close' mod='productdescriptioncustomizer'}</span>
 						</button>
 						<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 							<i class="icon-caret-down"></i>
 						</button>
 						<ul class="dropdown-menu">
 							<li>
-								<a href="{$htmlItems.postAction|escape:'htmlall':'UTF-8'}&amp;removeItem&amp;item_id={$item.id_prettypegs_attribute_preferences|escape:'htmlall':'UTF-8'}" name="removeItem" class="link-item-delete">
-									<i class="icon-trash"></i> {l s='Delete item' mod='prettypegsattributepreferences'}
+								<a href="{$htmlItems.postAction|escape:'htmlall':'UTF-8'}&amp;removeItem&amp;item_id={$item.pdc|escape:'htmlall':'UTF-8'}" name="removeItem" class="link-item-delete">
+									<i class="icon-trash"></i> {l s='Delete item' mod='productdescriptioncustomizer'}
 								</a>
 							</li>
 						</ul>
@@ -56,7 +56,7 @@
 
 							<input type="hidden" name="item_id" value="{$item.id_prettypegs_attribute_preferences|escape:'htmlall':'UTF-8'}" />
 							<div class="hook item-field form-group">
-								<label class="control-label col-lg-3">{l s='Attribute' mod='prettypegsattributepreferences'}</label>
+								<label class="control-label col-lg-3">{l s='Attribute' mod='productdescriptioncustomizer'}</label>
 								<div class="col-lg-7">
 									<select class="form-control fixed-width-lg" name="id_attribute" >
 
@@ -71,7 +71,7 @@
 							</div>
 
 							<div class="hook item-field form-group">
-								<label class="control-label col-lg-3">{l s='Product' mod='prettypegsattributepreferences'}</label>
+								<label class="control-label col-lg-3">{l s='Product' mod='productdescriptioncustomizer'}</label>
 								<div class="col-lg-7">
 									<select class="form-control fixed-width-lg" name="id_product" >
 
@@ -84,7 +84,7 @@
 							</div>
 
 							<div class="hook item-field form-group">
-								<label class="control-label col-lg-3">{l s='Category' mod='prettypegsattributepreferences'}</label>
+								<label class="control-label col-lg-3">{l s='Category' mod='productdescriptioncustomizer'}</label>
 								<div class="col-lg-7">
 									<select class="form-control fixed-width-lg" name="id_category" >
 
@@ -97,7 +97,7 @@
 							</div>
 
 							<div class="html item-field form-group">
-								<label class="control-label col-lg-3">{l s='Description' mod='prettypegsattributepreferences'}</label>
+								<label class="control-label col-lg-3">{l s='Description' mod='productdescriptioncustomizer'}</label>
 								<div class="col-lg-7">
 									<!--This is used in conjuction with the translations for this module-->
 									<input type="text" name="description" value="{$item.description|escape:'htmlall':'UTF-8'}">
@@ -107,10 +107,10 @@
 							<div class="form-group">
 								<div class="col-lg-7 col-lg-offset-3">
 									<button type="button" class="btn btn-default button-item-edit-cancel" >
-										<i class="icon-remove"></i> {l s='Cancel' mod='prettypegsattributepreferences'}
+										<i class="icon-remove"></i> {l s='Cancel' mod='productdescriptioncustomizer'}
 									</button>
 									<button type="submit" name="updateItem" class="btn btn-success button-save pull-right" >
-										<i class="icon-save"></i> {l s='Save' mod='prettypegsattributepreferences'}
+										<i class="icon-save"></i> {l s='Save' mod='productdescriptioncustomizer'}
 									</button>
 								</div>
 							</div>

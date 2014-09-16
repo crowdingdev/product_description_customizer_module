@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-	<name>prettypegsattributepreferences</name>
-	<displayName><![CDATA[Prettypegs Attribute Preferences]]></displayName>
+	<name>productdescriptioncustomizer</name>
+	<displayName><![CDATA[product description customizer]]></displayName>
 	<version><![CDATA[1.0]]></version>
-	<description><![CDATA[This module makes it possible to select what attributes a product fits depending on the category is in the breadcrumb.]]></description>
+	<description><![CDATA[Enables merchant to set different product description depending attributes selected on product page.]]></description>
 	<author><![CDATA[Linus Lundevall @prettypegs.com]]></author>
 	<tab><![CDATA[font_office_features]]></tab>
 	<confirmUninstall><![CDATA[Are you sure you want to uninstall? We are not friends anymore...]]></confirmUninstall>

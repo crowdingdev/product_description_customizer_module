@@ -25,14 +25,14 @@
 
 <div class="new-item">
 	<div class="form-group">
-		<button type="button" class="btn btn-default btn-lg button-new-item"><i class="icon-plus-sign"></i> {l s='Add item' mod='prettypegsattributepreferences'}</button>
+		<button type="button" class="btn btn-default btn-lg button-new-item"><i class="icon-plus-sign"></i> {l s='Add item' mod='productdescriptioncustomizer'}</button>
 	</div>
 	<div class="item-container" style="display:none;">
 		<form method="post" action="{$htmlItems.postAction|escape:'htmlall':'UTF-8'}" enctype="multipart/form-data" class="item-form defaultForm  form-horizontal">
 			<div class="well">
 
 				<div class="hook item-field form-group">
-					<label class="control-label col-lg-3">{l s='Attribute' mod='prettypegsattributepreferences'}</label>
+					<label class="control-label col-lg-3">{l s='Attribute' mod='productdescriptioncustomizer'}</label>
 					<div class="col-lg-7">
 						<select class="form-control fixed-width-lg" name="id_attribute" default="home">
 
@@ -46,7 +46,7 @@
 
 
 				<div class="hook item-field form-group">
-					<label class="control-label col-lg-3">{l s='Product' mod='prettypegsattributepreferences'}</label>
+					<label class="control-label col-lg-3">{l s='Product' mod='productdescriptioncustomizer'}</label>
 					<div class="col-lg-7">
 						<select class="form-control fixed-width-lg" name="id_product" default="home">
 
@@ -61,7 +61,7 @@
 
 
 				<div class="hook item-field form-group">
-					<label class="control-label col-lg-3">{l s='Category' mod='prettypegsattributepreferences'}</label>
+					<label class="control-label col-lg-3">{l s='Category' mod='productdescriptioncustomizer'}</label>
 					<div class="col-lg-7">
 						<select class="form-control fixed-width-lg" name="id_category" default="home">
 
@@ -74,7 +74,7 @@
 				</div>
 
 				<div class="html item-field form-group">
-					<label class="control-label col-lg-3">{l s='Description' mod='prettypegsattributepreferences'}</label>
+					<label class="control-label col-lg-3">{l s='Description' mod='productdescriptioncustomizer'}</label>
 					<div class="col-lg-7">
 						<input type="text" name="description" >
 					</div>
@@ -83,8 +83,8 @@
 
 				<div class="form-group">
 					<div class="col-lg-7 col-lg-offset-3">
-						<button type="button" class="btn btn-default button-new-item-cancel"><i class="icon-remove"></i> {l s='Cancel' mod='prettypegsattributepreferences'}</button>
-						<button type="submit" name="newItem" class="btn btn-success button-save pull-right"><i class="icon-save"></i> {l s='Save' mod='prettypegsattributepreferences'}</button>
+						<button type="button" class="btn btn-default button-new-item-cancel"><i class="icon-remove"></i> {l s='Cancel' mod='productdescriptioncustomizer'}</button>
+						<button type="submit" name="newItem" class="btn btn-success button-save pull-right"><i class="icon-save"></i> {l s='Save' mod='productdescriptioncustomizer'}</button>
 					</div>
 				</div>
 			</div>

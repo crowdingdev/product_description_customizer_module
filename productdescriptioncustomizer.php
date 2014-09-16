@@ -3,18 +3,18 @@ if (!defined('_PS_VERSION_')){
   exit;
   }
 
-require_once(_PS_MODULE_DIR_.'prettypegsattributepreferences/classes/DBQueryHelperClass.php');
+require_once(_PS_MODULE_DIR_.'productdescriptioncustomizer/classes/DBQueryHelper.php');
 
-class PrettypegsAttributePreferences extends Module
+class ProductDescriptionCustomizer extends Module
 {
-	protected $max_image_size = 1048576;
+	//protected $max_image_size = 1048576;
 
 	/**
 	* @author Linus Lundevall <developer@prettypegs.com>
 	*/
 	public function __construct()
 	{
-		$this->name = 'prettypegsattributepreferences';
+		$this->name = 'productdescriptioncustomizer';
 		$this->tab = 'font_office_features';
 		$this->version = '1.0';
 		$this->author = 'Linus Lundevall @prettypegs.com';
@@ -29,8 +29,8 @@ class PrettypegsAttributePreferences extends Module
 
 		parent::__construct();
 
-		$this->displayName = $this->l('Prettypegs Attribute Preferences');
-		$this->description = $this->l('This module makes it possible to select what attributes a product fits depending on the category is in the breadcrumb.');
+		$this->displayName = $this->l('product description customizer');
+		$this->description = $this->l('Enables merchant to set different product description depending attributes selected on product page.');
 
 		$this->confirmUninstall = $this->l('Are you sure you want to uninstall? We are not friends anymore...');
 
@@ -53,7 +53,11 @@ class PrettypegsAttributePreferences extends Module
   	return parent::install() &&
   	$this->installDB() &&
     $this->registerHook('header') &&
-    $this->registerHook('displayBackOfficeHeader');
+    $this->registerHook('displayBackOfficeHeader') &&
+    $this->registerHook('displayFooterProduct') &&
+    $this->registerHook('productTabContent');
+
+    //displayRightColumnProduct
 	}
 
 	/**
@@ -77,7 +81,7 @@ class PrettypegsAttributePreferences extends Module
 
 		if (Tools::isSubmit('submit'.$this->name))
 		{
-			$image_cloud_gallery = strval(Tools::getValue('IMAGECLOUDGALLERY_NAME'));
+			$image_cloud_gallery = strval(Tools::getValue('PDC_NAME'));
 			if (!$image_cloud_gallery
 				|| empty($image_cloud_gallery)
 				|| !Validate::isGenericName($image_cloud_gallery)) {
@@ -85,7 +89,7 @@ class PrettypegsAttributePreferences extends Module
 			}
 			else
 			{
-				Configuration::updateValue('IMAGECLOUDGALLERY_NAME', $image_cloud_gallery);
+				Configuration::updateValue('PDC_NAME', $image_cloud_gallery);
 				$output .= $this->displayConfirmation($this->l('Settings updated'));
 			}
 		}
@@ -169,12 +173,57 @@ class PrettypegsAttributePreferences extends Module
 	public function hookDisplayHeader()
 	{
 
-		$attributePreference = DBQueryHelperClass::getAllEnabledPrettypegsAttributePreference();
+		$attributePreference = DBQueryHelper::getAllEnabledItems();
 		$this->context->smarty->assign(array('attributePreference' => $attributePreference));
+
+		$languages = Language::getLanguages();
+		$this->context->smarty->assign(array('languages' => $languages));
+
 		$this->context->controller->addJS($this->_path.'js/header.js');
 		//$this->context->controller->addCSS($this->_path.'css/prettypegsattributepreferences.css', 'all');
 
 		return $this->display(__FILE__, 'views/templates/hook/header.tpl');
+	}
+
+
+
+	/**
+	* @author Linus Lundevall <developer@prettypegs.com>
+	*/
+	public function hookDisplayFooterProduct()
+	{
+
+		// $attributePreference = DBQueryHelper::getAllEnabledItems();
+		// $this->context->smarty->assign(array('attributePreference' => $attributePreference));
+
+		// $languages = Language::getLanguages();
+		// $this->context->smarty->assign(array('languages' => $languages));
+
+		// $this->context->controller->addJS($this->_path.'js/header.js');
+		//$this->context->controller->addCSS($this->_path.'css/prettypegsattributepreferences.css', 'all');
+
+		return $this->display(__FILE__, 'views/templates/hook/displayfooterproduct.tpl');
+	}
+
+
+
+
+	/**
+	* @author Linus Lundevall <developer@prettypegs.com>
+	*/
+	public function hookProductTabContent()
+	{
+
+		// $attributePreference = DBQueryHelper::getAllEnabledItems();
+		// $this->context->smarty->assign(array('attributePreference' => $attributePreference));
+
+		// $languages = Language::getLanguages();
+		// $this->context->smarty->assign(array('languages' => $languages));
+
+		// $this->context->controller->addJS($this->_path.'js/header.js');
+		//$this->context->controller->addCSS($this->_path.'css/prettypegsattributepreferences.css', 'all');
+
+		return $this->display(__FILE__, 'views/templates/hook/displayfooterproduct.tpl');
 	}
 
 	/**
@@ -184,20 +233,31 @@ class PrettypegsAttributePreferences extends Module
 	private function installDB()
 	{
 		return (
-			Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'prettypegs_attribute_preferences`') &&
+			Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'pdc`') &&
+
 			Db::getInstance()->Execute("
-			CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."prettypegs_attribute_preferences` (
-			  `id_prettypegs_attribute_preferences` int(255) unsigned NOT NULL AUTO_INCREMENT,
-			  `id_product` int(11) NOT NULL,
-			  `id_category` int(11) NOT NULL,
-			  `id_attribute` int(11) NOT NULL,
-				`enabled` tinyint(1) unsigned NOT NULL DEFAULT '1',
-			  `description` text NOT NULL,
-			  `importance` int(10) unsigned NOT NULL ,
-			  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Date when this that was created.',
-			  PRIMARY KEY (`id_prettypegs_attribute_preferences`),
-			   KEY `select` (`id_product`,`id_category`,`id_attribute`)
-			) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;"));
+				CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."pdc` (
+				  `id_pdc` int(255) unsigned NOT NULL AUTO_INCREMENT,
+				  `id_product` int(11) NOT NULL,
+				  `id_attribute` int(11) NOT NULL,
+					`enabled` tinyint(1) unsigned NOT NULL DEFAULT '1',
+				  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Date when this that was created.',
+				  PRIMARY KEY (`id_pdc`),
+				   KEY `select` (`id_pdc`,`id_product`,`id_attribute`)
+				) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;") &&
+
+			Db::getInstance()->Execute("
+				CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."pdc_description_lang` (
+				  `id_description` int(255) unsigned NOT NULL AUTO_INCREMENT,
+				  `id_lang` int(11) NOT NULL,
+	  			`html` text,
+				  PRIMARY KEY (`id_description`,`id_lang`)
+				) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;")
+
+			);
+
+
+
 
 	}
 
@@ -224,22 +284,18 @@ class PrettypegsAttributePreferences extends Module
 				)
 			));
 
-		require_once(_PS_MODULE_DIR_.'prettypegsattributepreferences/classes/DBQueryHelperClass.php');
+		$attributes = DBQueryHelper::getAllAttributes();
+		$products = DBQueryHelper::getAllProducts();
 
-		$attributes = DBQueryHelperClass::getAllAttributes();
-		$products = DBQueryHelperClass::getAllProducts();
-		$categories = DBQueryHelperClass::getAllCategories();
-		$items = DBQueryHelperClass::getAllPrettypegsAttributePreference();
+		$items = DBQueryHelper::getAllItems();
 
 		//$this->context->smarty->assign(array('items' => $items));
   	$this->context->smarty->assign(array('attributes' => $attributes));
 		$this->context->smarty->assign(array('products' => $products));
-		$this->context->smarty->assign(array('categories' => $categories));
-
 
 
 		$this->context->smarty->assign('htmlItems', array('items' => $items,
-			'postAction' => 
+			'postAction' =>
 			'index.php?tab=AdminModules&configure='.$this->name
 			.'&token='.Tools::getAdminTokenLite('AdminModules')
 			.'&tab_module=other&module_name='.$this->name.'',
@@ -259,15 +315,13 @@ class PrettypegsAttributePreferences extends Module
 	*/
 	protected function updateItem()
 	{
-		require_once(_PS_MODULE_DIR_.'prettypegsattributepreferences/classes/DBQueryHelperClass.php');
 
 		$id_item = Tools::getValue('item_id');
 		$id_product = Tools::getValue('id_product');
-		$id_category = Tools::getValue('id_category');
 		$id_attribute = Tools::getValue('id_attribute');
-		$description = Tools::getValue('description');
+		//$description = Tools::getValue('description');
 
-		$result = DBQueryHelperClass::updatePrettypegsAttributePreference($id_item, $id_attribute, $id_category, $id_product, $description);
+		$result = DBQueryHelper::updateItem($id_item, $id_attribute, $id_product);
 
 		if(!$result){
 			$this->context->smarty->assign('error', $this->l('An error occurred while saving data.'));
@@ -286,16 +340,13 @@ class PrettypegsAttributePreferences extends Module
 	protected function addItem()
 	{
 
-		require_once(_PS_MODULE_DIR_.'prettypegsattributepreferences/classes/DBQueryHelperClass.php');
-
-		$attributes = DBQueryHelperClass::getAllAttributes();
+		$attributes = DBQueryHelper::getAllAttributes();
 
 		$id_product = Tools::getValue('id_product');
-		$id_category = Tools::getValue('id_category');
 		$id_attribute = Tools::getValue('id_attribute');
 		$description = Tools::getValue('description');
 
-		$insertResult = DBQueryHelperClass::insertPrettypegsAttributePreference($id_attribute, $id_category, $id_product, $description);
+		$insertResult = DBQueryHelper::insertItem($id_attribute, $id_product, $description);
 
 		if (!$insertResult){
 			$this->context->smarty->assign('error', $this->l('An error occurred while saving data.'));
@@ -312,14 +363,14 @@ class PrettypegsAttributePreferences extends Module
 	{
 		$id_item = (int)Tools::getValue('item_id');
 
-		Db::getInstance()->delete(_DB_PREFIX_.'prettypegs_attribute_preferences', 'id_prettypegs_attribute_preferences = '.(int)$id_item);
+		Db::getInstance()->delete(_DB_PREFIX_.'pdc', 'id = '.(int)$id_item);
 
 		if (Db::getInstance()->Affected_Rows() == 1)
 		{
 			Tools::redirectAdmin('index.php?tab=AdminModules&configure='.$this->name.'&conf=6&token='.Tools::getAdminTokenLite('AdminModules'));
 		}
 		else
-			$this->context->smarty->assign('error', $this->l('Can\'t delete the slide.'));
+			$this->context->smarty->assign('error', $this->l('Can\'t delete the preference.'));
 	}
 
 }
