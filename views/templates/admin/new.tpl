@@ -44,7 +44,6 @@
 					</div>
 				</div>
 
-
 				<div class="hook item-field form-group">
 					<label class="control-label col-lg-3">{l s='Product' mod='productdescriptioncustomizer'}</label>
 					<div class="col-lg-7">
@@ -57,8 +56,6 @@
 						</select>
 					</div>
 				</div>
-
-
 
 				<div class="hook item-field form-group">
 					<label class="control-label col-lg-3">{l s='Category' mod='productdescriptioncustomizer'}</label>
@@ -79,6 +76,17 @@
 						<input type="text" name="description" >
 					</div>
 				</div>
+
+				{foreach from=$languages item=language}
+
+					<div class="html item-field form-group">
+						<label class="control-label col-lg-3">{$language.name} ({l s='HTML' mod='productdescriptioncustomizer'})</label>
+						<div class="col-lg-7">
+							<textarea name="item_lang_{$language.id_lang}" cols="65" rows="12"></textarea>
+						</div>
+					</div>
+
+				{/foreach}
 
 
 				<div class="form-group">

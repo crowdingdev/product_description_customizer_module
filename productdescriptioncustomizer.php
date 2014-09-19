@@ -52,12 +52,11 @@ class ProductDescriptionCustomizer extends Module
 
   	return parent::install() &&
   	$this->installDB() &&
-    $this->registerHook('header') &&
     $this->registerHook('displayBackOfficeHeader') &&
-    $this->registerHook('displayFooterProduct') &&
     $this->registerHook('productTabContent');
 
-    //displayRightColumnProduct
+    // $this->registerHook('displayFooterProduct') &&
+   	//displayRightColumnProduct
 	}
 
 	/**
@@ -167,63 +166,32 @@ class ProductDescriptionCustomizer extends Module
 	}
 
 
-	/**
-	* @author Linus Lundevall <developer@prettypegs.com>
-	*/
-	public function hookDisplayHeader()
-	{
-
-		$attributePreference = DBQueryHelper::getAllEnabledItems();
-		$this->context->smarty->assign(array('attributePreference' => $attributePreference));
-
-		$languages = Language::getLanguages();
-		$this->context->smarty->assign(array('languages' => $languages));
-
-		$this->context->controller->addJS($this->_path.'js/header.js');
-		//$this->context->controller->addCSS($this->_path.'css/prettypegsattributepreferences.css', 'all');
-
-		return $this->display(__FILE__, 'views/templates/hook/header.tpl');
-	}
-
-
 
 	/**
-	* @author Linus Lundevall <developer@prettypegs.com>
-	*/
-	public function hookDisplayFooterProduct()
-	{
-
-		// $attributePreference = DBQueryHelper::getAllEnabledItems();
-		// $this->context->smarty->assign(array('attributePreference' => $attributePreference));
-
-		// $languages = Language::getLanguages();
-		// $this->context->smarty->assign(array('languages' => $languages));
-
-		// $this->context->controller->addJS($this->_path.'js/header.js');
-		//$this->context->controller->addCSS($this->_path.'css/prettypegsattributepreferences.css', 'all');
-
-		return $this->display(__FILE__, 'views/templates/hook/displayfooterproduct.tpl');
-	}
-
-
-
-
-	/**
+	* This displays on the product page below the products description.
 	* @author Linus Lundevall <developer@prettypegs.com>
 	*/
 	public function hookProductTabContent()
 	{
-
-		// $attributePreference = DBQueryHelper::getAllEnabledItems();
-		// $this->context->smarty->assign(array('attributePreference' => $attributePreference));
-
 		// $languages = Language::getLanguages();
-		// $this->context->smarty->assign(array('languages' => $languages));
 
-		// $this->context->controller->addJS($this->_path.'js/header.js');
+		$lang = Tools::getvalue('id_lang');
+		$id_product = Tools::getvalue('id_product');
+
+		$items = DBQueryHelper::getItemsByIdProduct($id_product);
+
+		$ILanguages = DBQueryHelper::getItemLangsByPDCObjects($items);
+
+		$this->context->smarty->assign(array('lang' => $lang));
+		$this->context->smarty->assign(array('product' => $id_product));
+
+		$this->context->smarty->assign(array('ILanguages' => $ILanguages));
+		$this->context->smarty->assign(array('spec_items' => $items));
+
+		$this->context->controller->addJS($this->_path.'js/producttabcontent.js');
 		//$this->context->controller->addCSS($this->_path.'css/prettypegsattributepreferences.css', 'all');
 
-		return $this->display(__FILE__, 'views/templates/hook/displayfooterproduct.tpl');
+		return $this->display(__FILE__, 'views/templates/hook/producttabcontent.tpl');
 	}
 
 	/**
@@ -233,6 +201,7 @@ class ProductDescriptionCustomizer extends Module
 	private function installDB()
 	{
 		return (
+			Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'pdc_lang`')  &&
 			Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'pdc`') &&
 
 			Db::getInstance()->Execute("
@@ -241,23 +210,22 @@ class ProductDescriptionCustomizer extends Module
 				  `id_product` int(11) NOT NULL,
 				  `id_attribute` int(11) NOT NULL,
 					`enabled` tinyint(1) unsigned NOT NULL DEFAULT '1',
+					`description` text,
 				  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Date when this that was created.',
 				  PRIMARY KEY (`id_pdc`),
 				   KEY `select` (`id_pdc`,`id_product`,`id_attribute`)
 				) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;") &&
 
 			Db::getInstance()->Execute("
-				CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."pdc_description_lang` (
-				  `id_description` int(255) unsigned NOT NULL AUTO_INCREMENT,
+				CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."pdc_lang` (
+				  `id_pdc_lang` int(255) unsigned NOT NULL AUTO_INCREMENT,
+				  `id_pdc` int(11) NOT NULL,
 				  `id_lang` int(11) NOT NULL,
 	  			`html` text,
-				  PRIMARY KEY (`id_description`,`id_lang`)
+				  PRIMARY KEY (`id_pdc_lang`)
 				) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;")
 
 			);
-
-
-
 
 	}
 
@@ -286,24 +254,33 @@ class ProductDescriptionCustomizer extends Module
 
 		$attributes = DBQueryHelper::getAllAttributes();
 		$products = DBQueryHelper::getAllProducts();
-
 		$items = DBQueryHelper::getAllItems();
+		$languages = Language::getLanguages();
 
 		//$this->context->smarty->assign(array('items' => $items));
   	$this->context->smarty->assign(array('attributes' => $attributes));
 		$this->context->smarty->assign(array('products' => $products));
+		$this->context->smarty->assign(array('languages' => $languages));
 
+		// This creates an array with a pdc row and its associate pdc_lang rows in one array.
+		// Like this: itemsAndLang[ [item => [], languages => [] ] ]
+		$itemsAndLang = array();
+		foreach($items as $item){
 
-		$this->context->smarty->assign('htmlItems', array('items' => $items,
+			$tempArray = array();
+			$tempArray['item'] = $item;
+			$tempArray['languages'] = DBQueryHelper::getPDCLang($item['id_pdc']);
+
+			array_push($itemsAndLang, $tempArray);
+		}
+
+		$this->context->smarty->assign('htmlItems', array('items' => $itemsAndLang,
 			'postAction' =>
 			'index.php?tab=AdminModules&configure='.$this->name
 			.'&token='.Tools::getAdminTokenLite('AdminModules')
 			.'&tab_module=other&module_name='.$this->name.'',
 			'id_shop' => $id_shop
 			));
-
-
-
 
 		return $this->display(__FILE__, 'views/templates/admin/admin.tpl');
 	}
@@ -315,13 +292,17 @@ class ProductDescriptionCustomizer extends Module
 	*/
 	protected function updateItem()
 	{
-
 		$id_item = Tools::getValue('item_id');
 		$id_product = Tools::getValue('id_product');
 		$id_attribute = Tools::getValue('id_attribute');
-		//$description = Tools::getValue('description');
+		$description = Tools::getValue('description');
+		$result = DBQueryHelper::updateItem($id_item, $id_attribute, $id_product, $description);
+		$languages = Language::getLanguages();
 
-		$result = DBQueryHelper::updateItem($id_item, $id_attribute, $id_product);
+		foreach($languages as $lang){
+			$html = Tools::getValue('item_lang_' . $lang['id_lang']);
+			DBQueryHelper::updateItemLang($id_item, $lang['id_lang'], $html);
+		}
 
 		if(!$result){
 			$this->context->smarty->assign('error', $this->l('An error occurred while saving data.'));
@@ -339,16 +320,21 @@ class ProductDescriptionCustomizer extends Module
 	*/
 	protected function addItem()
 	{
-
 		$attributes = DBQueryHelper::getAllAttributes();
 
 		$id_product = Tools::getValue('id_product');
 		$id_attribute = Tools::getValue('id_attribute');
 		$description = Tools::getValue('description');
 
-		$insertResult = DBQueryHelper::insertItem($id_attribute, $id_product, $description);
+		$insertResultId = DBQueryHelper::insertItem($id_attribute, $id_product, $description);
+		$languages = Language::getLanguages();
 
-		if (!$insertResult){
+		foreach($languages as $lang){
+			$html = Tools::getValue('item_lang_' . $lang['id_lang']);
+			DBQueryHelper::insertItemLang($insertResultId, $lang['id_lang'], $html);
+		}
+
+		if (!$insertResultId){
 			$this->context->smarty->assign('error', $this->l('An error occurred while saving data.'));
 			return false;
 		}
@@ -363,14 +349,16 @@ class ProductDescriptionCustomizer extends Module
 	{
 		$id_item = (int)Tools::getValue('item_id');
 
-		Db::getInstance()->delete(_DB_PREFIX_.'pdc', 'id = '.(int)$id_item);
+		Db::getInstance()->delete(_DB_PREFIX_.'pdc', 'id_pdc = '.$id_item);
+		Db::getInstance()->delete(_DB_PREFIX_.'pdc_lang', 'id_pdc_lang = '.$id_item);
 
-		if (Db::getInstance()->Affected_Rows() == 1)
+		if (Db::getInstance()->Affected_Rows() > 0)
 		{
 			Tools::redirectAdmin('index.php?tab=AdminModules&configure='.$this->name.'&conf=6&token='.Tools::getAdminTokenLite('AdminModules'));
 		}
-		else
+		else{
 			$this->context->smarty->assign('error', $this->l('Can\'t delete the preference.'));
+		}
 	}
 
 }

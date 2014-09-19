@@ -5,7 +5,6 @@ Här väljer vilka produkt attribut som ska vara förvalda i kombination med oli
 
 {include file="{$htmlcontent.admin_tpl_path|escape:'htmlall':'UTF-8'}new.tpl"}
 
-<!--{$attributes|@print_r}-->
 
 
 <div id="htmlcontent" class="panel">

@@ -38,10 +38,38 @@ class DBQueryHelper extends ObjectModel
 	public static function insertItem($id_attribute, $id_product, $description)
 	{
 		$sql = '
-		INSERT INTO '._DB_PREFIX_.'pdc (`id_attribute`,`id_product`)
+		INSERT INTO '._DB_PREFIX_.'pdc (`id_attribute`,`id_product`, `description`)
 		VALUES (' .
 			(int)$id_attribute.', '.
-			(int)$id_product.' '.
+			(int)$id_product.', '.
+			'\'' . pSQL($description) .'\'' .
+			')';
+
+		$result = Db::getInstance()->Execute($sql);
+
+		if($result)
+		{
+			return Db::getInstance()->Insert_ID();
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+	/**
+	*	Insert a new pdc-row into database
+	* @author Linus Karlsson
+	*/
+	public static function insertItemLang($id_pdc, $id_lang, $html)
+	{
+		$sql = '
+		INSERT INTO '._DB_PREFIX_.'pdc_lang (`id_pdc`,`id_lang`, `html`)
+		VALUES (' .
+			(int)$id_pdc.', '.
+			(int)$id_lang.', '.
+			'\'' . pSQL($html).'\'' .
 			')';
 
 		$result = Db::getInstance()->Execute($sql);
@@ -60,16 +88,37 @@ class DBQueryHelper extends ObjectModel
 	*	Update a pdc-row in database
 	* @author Linus Karlsson
 	*/
-	public static function updateItem($id_item, $id_attribute, $id_product)
+	public static function updateItem($id_item, $id_attribute, $id_product, $description)
 	{
-		$result = Db::getInstance()->execute('
-			UPDATE `'._DB_PREFIX_.'pdc` SET
-			id_attribute = '. (int)$id_attribute .', '.
-			'id_product = '. (int)$id_product .' '.
+		$result = Db::getInstance()->execute(
+			'UPDATE `'._DB_PREFIX_.'pdc` SET
+				id_attribute = '. (int)$id_attribute .', '.
+			' description = \''. pSQL($description).'\' ,' .
+			' id_product = '. (int)$id_product .' '.
 			' WHERE id_pdc = '. (int)$id_item
 			);
 		return $result;
 	}
+
+
+	/**
+	*	Update a pdc_lang-row in database
+	* @author Linus Karlsson
+	*/
+	public static function updateItemLang($id_pdc, $id_lang, $html)
+	{
+
+		$sqlStr = '
+				UPDATE `'._DB_PREFIX_.'pdc_lang` SET '.
+			'	html = \'' . pSQL($html) . '\' ' .
+			' WHERE id_pdc = '. (int)$id_pdc .
+			' AND id_lang = '. (int)$id_lang;
+
+		$result = Db::getInstance()->execute($sqlStr);
+		return $result;
+	}
+
+
 
 	/**
 	*	List all pdc-rows
@@ -78,7 +127,8 @@ class DBQueryHelper extends ObjectModel
 	public static function getAllItems()
 	{
 		$result = Db::getInstance()->ExecuteS('
-			SELECT * FROM '._DB_PREFIX_.'pdc'
+			SELECT * FROM '._DB_PREFIX_.'pdc' .
+			' ORDER BY id_product ASC'
 			);
 		return $result;
 	}
@@ -95,6 +145,59 @@ class DBQueryHelper extends ObjectModel
 			);
 		return $result;
 	}
+
+
+
+	/**
+	*	Get items items for a product 
+	* @author Linus Karlsson
+	*/
+	public static function getItemsByIdProduct($id_product)
+	{
+		$result = Db::getInstance()->ExecuteS('
+			SELECT * FROM '._DB_PREFIX_.'pdc '.
+			' WHERE id_product = '. (int)$id_product
+			);
+		return $result;
+	}
+
+
+		/**
+	*	Get all lang items
+	* @author Linus Karlsson
+	*/
+	public static function getItemLangsByPDCObjects($pdc_objects)
+	{
+
+		$pdc_ids = array();
+    foreach($pdc_objects as $k=>$v) {
+        $pdc_ids[]= $v['id_pdc'];
+        print_r($k);
+    }
+		//$pdc_ids = array_map(create_function('$o', 'return $o->id_pdc;'), $pdc_objects);
+		error_log("lalalalalallalalalala:");
+		error_log(print_r($pdc_ids));
+		$result = Db::getInstance()->ExecuteS('
+			SELECT * FROM '._DB_PREFIX_.'pdc_lang '.
+			' WHERE id_pdc in ('. implode(', ', $pdc_ids) . ') '
+			);
+		return $result;
+	}
+
+	/**
+	*	Get all lang items for a pdc item with joind ps_lang table
+	* @author Linus Karlsson
+	*/
+	public static function getPDCLang($id_pdc)
+	{
+		$result = Db::getInstance()->ExecuteS('
+			SELECT * FROM '._DB_PREFIX_.'pdc_lang pdc_l'.
+			' INNER JOIN '._DB_PREFIX_. 'lang l ON l.id_lang = pdc_l.id_lang'  .
+			' WHERE id_pdc = '. (int)$id_pdc
+			);
+		return $result;
+	}
+
 
 }
 
