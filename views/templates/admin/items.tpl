@@ -49,12 +49,7 @@
 					</div>
 
 					<p><strong>ID: </strong>{$item.item.id_pdc}<p>
-
 						<p><strong>Description: </strong>{$item.item.description}<p>
-
-									{foreach from=$item.languages item=language}
-									{$language.html}
-									{/foreach}
 
 						<div class="item-container clearfix" style="display:none">
 
@@ -127,3 +122,13 @@
 			{/foreach}
 		</ul>
 	</div>
+
+<script language="javascript" type="text/javascript"> 
+$(document).ready(function(){
+        {block name="autoload_tinyMCE"}
+            tinySetup({
+                editor_selector :"autoload_rte"
+            });
+        {/block}
+    });
+</script>

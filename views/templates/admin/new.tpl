@@ -57,18 +57,6 @@
 					</div>
 				</div>
 
-				<div class="hook item-field form-group">
-					<label class="control-label col-lg-3">{l s='Category' mod='productdescriptioncustomizer'}</label>
-					<div class="col-lg-7">
-						<select class="form-control fixed-width-lg" name="id_category" default="home">
-
-							{foreach from=$categories item=category}
-								<option value="{$category.id_category}">{$category.name}</option>  
-							{/foreach}
-
-						</select>
-					</div>
-				</div>
 
 				<div class="html item-field form-group">
 					<label class="control-label col-lg-3">{l s='Description' mod='productdescriptioncustomizer'}</label>

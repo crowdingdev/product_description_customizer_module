@@ -69,7 +69,7 @@ class DBQueryHelper extends ObjectModel
 		VALUES (' .
 			(int)$id_pdc.', '.
 			(int)$id_lang.', '.
-			'\'' . pSQL($html).'\'' .
+			'\'' . pSQL($html, true).'\'' .
 			')';
 
 		$result = Db::getInstance()->Execute($sql);
@@ -93,7 +93,7 @@ class DBQueryHelper extends ObjectModel
 		$result = Db::getInstance()->execute(
 			'UPDATE `'._DB_PREFIX_.'pdc` SET
 				id_attribute = '. (int)$id_attribute .', '.
-			' description = \''. pSQL($description).'\' ,' .
+			' description = \''. pSQL($description, true).'\' ,' .
 			' id_product = '. (int)$id_product .' '.
 			' WHERE id_pdc = '. (int)$id_item
 			);
@@ -110,7 +110,7 @@ class DBQueryHelper extends ObjectModel
 
 		$sqlStr = '
 				UPDATE `'._DB_PREFIX_.'pdc_lang` SET '.
-			'	html = \'' . pSQL($html) . '\' ' .
+			'	html = \'' . pSQL($html, true) . '\' ' .
 			' WHERE id_pdc = '. (int)$id_pdc .
 			' AND id_lang = '. (int)$id_lang;
 
@@ -147,7 +147,6 @@ class DBQueryHelper extends ObjectModel
 	}
 
 
-
 	/**
 	*	Get items items for a product 
 	* @author Linus Karlsson
@@ -162,8 +161,8 @@ class DBQueryHelper extends ObjectModel
 	}
 
 
-		/**
-	*	Get all lang items
+	/**
+	*	Get all lang items by sending pdc items as param.
 	* @author Linus Karlsson
 	*/
 	public static function getItemLangsByPDCObjects($pdc_objects)
@@ -172,11 +171,8 @@ class DBQueryHelper extends ObjectModel
 		$pdc_ids = array();
     foreach($pdc_objects as $k=>$v) {
         $pdc_ids[]= $v['id_pdc'];
-        print_r($k);
     }
-		//$pdc_ids = array_map(create_function('$o', 'return $o->id_pdc;'), $pdc_objects);
-		error_log("lalalalalallalalalala:");
-		error_log(print_r($pdc_ids));
+
 		$result = Db::getInstance()->ExecuteS('
 			SELECT * FROM '._DB_PREFIX_.'pdc_lang '.
 			' WHERE id_pdc in ('. implode(', ', $pdc_ids) . ') '

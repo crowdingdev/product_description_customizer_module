@@ -165,31 +165,25 @@ class ProductDescriptionCustomizer extends Module
 		$this->context->controller->addJS($this->_path.'js/admin.js');
 	}
 
-
-
 	/**
-	* This displays on the product page below the products description.
+	* This displays on the product page.
 	* @author Linus Lundevall <developer@prettypegs.com>
 	*/
 	public function hookProductTabContent()
 	{
-		// $languages = Language::getLanguages();
+		$current_lang_id = Tools::getvalue('id_lang');
+		$current_id_product = Tools::getvalue('id_product');
 
-		$lang = Tools::getvalue('id_lang');
-		$id_product = Tools::getvalue('id_product');
+		$pdc_items = DBQueryHelper::getItemsByIdProduct($current_id_product);
+		$pdc_lang_items = DBQueryHelper::getItemLangsByPDCObjects($pdc_items);
 
-		$items = DBQueryHelper::getItemsByIdProduct($id_product);
-
-		$ILanguages = DBQueryHelper::getItemLangsByPDCObjects($items);
-
-		$this->context->smarty->assign(array('lang' => $lang));
-		$this->context->smarty->assign(array('product' => $id_product));
-
-		$this->context->smarty->assign(array('ILanguages' => $ILanguages));
-		$this->context->smarty->assign(array('spec_items' => $items));
+		$this->context->smarty->assign(array('current_lang_id' => $current_lang_id ));
+		$this->context->smarty->assign(array('current_id_product' => $current_id_product));
+		$this->context->smarty->assign(array('pdc_lang_items' => $pdc_lang_items));
+		$this->context->smarty->assign(array('pdc_items' => $pdc_items));
 
 		$this->context->controller->addJS($this->_path.'js/producttabcontent.js');
-		//$this->context->controller->addCSS($this->_path.'css/prettypegsattributepreferences.css', 'all');
+		//$this->context->controller->addCSS($this->_path.'css/productdescriptioncustomizer.css', 'all');
 
 		return $this->display(__FILE__, 'views/templates/hook/producttabcontent.tpl');
 	}
@@ -200,10 +194,12 @@ class ProductDescriptionCustomizer extends Module
 	*/
 	private function installDB()
 	{
-		return (
+		/*
 			Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'pdc_lang`')  &&
 			Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'pdc`') &&
+		*/
 
+		return (
 			Db::getInstance()->Execute("
 				CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."pdc` (
 				  `id_pdc` int(255) unsigned NOT NULL AUTO_INCREMENT,
